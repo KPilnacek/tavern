@@ -201,6 +201,23 @@ class TestDelay:
         assert pmock.called
         smock.assert_called_with(2)
 
+    def test_sleep_retry(self, fulltest, mockargs, includes):
+        """Should sleep with delay_retry in stage spec"""
+
+        fulltest["stages"][0]["delay_retry"] = 2
+        fulltest["stages"][0]["max_retries"] = 1
+        mockargs['status_code'] = 400
+
+        mock_response = Mock(**mockargs)
+
+        with patch("tavern._plugins.rest.request.requests.Session.request", return_value=mock_response) as pmock:
+            with patch("tavern.util.delay.time.sleep") as smock:
+                with pytest.raises(exceptions.TestFailError):
+                    run_test("heif", fulltest, includes)
+
+        assert pmock.called
+        smock.assert_called_with(2)
+
 
 class TestTavernMetaFormat:
 

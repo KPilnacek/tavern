@@ -29,7 +29,7 @@ def retry(stage):
                     exception = e
                     if i < max_retries:
                         logger.info("Stage '%s' failed for %i time. Retrying.", stage['name'], i + 1)
-                        delay(stage, 'after')
+                        delay(stage, 'retry')
                 else:
                     break
             else:
@@ -41,6 +41,9 @@ def retry(stage):
             logger.debug("Stage '%s' succeed after %i retries.", stage['name'], i)  # pylint: disable=undefined-loop-variable
             return res
 
-        return wrapped
+        if max_retries:
+            return wrapped
+        else:
+            return fn
 
     return decorator
