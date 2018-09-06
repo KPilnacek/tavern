@@ -63,7 +63,7 @@ def run_test(in_file, test_spec, global_cfg):
         TavernException: If any of the tests failed
     """
 
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,too-many-statements
 
     # Initialise test config for this test with the global configuration before
     # starting
@@ -141,12 +141,15 @@ def run_test(in_file, test_spec, global_cfg):
             if stage.get('max_retries'):
                 run_stage_ = retry(stage)(run_stage_)
 
+            delay(stage, "before")
             try:
                 run_stage_(sessions, stage, tavern_box, test_block_config)
             except exceptions.TavernException as e:
                 e.stage = stage
                 e.test_block_config = test_block_config
                 raise
+            else:
+                delay(stage, "after")
 
             if stage.get('only'):
                 break
@@ -170,8 +173,6 @@ def run_stage(sessions, stage, tavern_box, test_block_config):
 
     expected = get_expected(stage, test_block_config, sessions)
 
-    delay(stage, "before")
-
     logger.info("Running stage : %s", name)
     response = r.run()
 
@@ -181,7 +182,6 @@ def run_stage(sessions, stage, tavern_box, test_block_config):
         test_block_config["variables"].update(saved)
 
     tavern_box.pop("request_vars")
-    delay(stage, "after")
 
 
 def _run_pytest(in_file, tavern_global_cfg, tavern_mqtt_backend=None, tavern_http_backend=None, tavern_strict=None, pytest_args=None, **kwargs): # pylint: disable=too-many-arguments

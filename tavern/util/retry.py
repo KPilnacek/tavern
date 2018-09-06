@@ -29,7 +29,7 @@ def retry(stage):
                     exception = e
                     if i < max_retries:
                         logger.info("Stage '%s' failed for %i time. Retrying.", stage['name'], i + 1)
-                        delay(stage, 'after')
+                        delay(stage, 'retry')
                 else:
                     break
             else:

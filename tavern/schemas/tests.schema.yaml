@@ -57,6 +57,9 @@ schema;stage:
     delay_after:
       type: float
       required: false
+    delay_retry:
+      type: float
+      required: false
 
     mqtt_publish:
       type: map
